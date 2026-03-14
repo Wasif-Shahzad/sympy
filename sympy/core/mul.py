@@ -921,6 +921,17 @@ class Mul(Expr, AssocOp):
         else:
             r, i = -imco*i, imco*r
             return (r*addre - i*addim, r*addim + i*addre)
+        
+    def removeO(self) -> Expr:
+        """Removes the additive O(..) symbol if there is one"""
+        return Mul(*[a.removeO() for a in self.args])
+
+    def getO(self) -> Expr | None:
+        """Returns the additive O(..) symbol if there is one, else None."""
+        expanded = self.expand()
+        if expanded == self:
+            return None
+        return expanded.getO()
 
     @staticmethod
     def _expandsums(sums):

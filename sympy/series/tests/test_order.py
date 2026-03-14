@@ -350,6 +350,27 @@ def test_issue_6753():
     assert (1 + x**2)**10000*O(x) == O(x)
 
 
+def test_issue_27031():
+    assert ((1 + O(x)) * exp(x)).getO() == O(x)
+    assert ((x + y) * O(x)).getO() == O(x)
+
+    expr = (x**2 + y*x + z) * O(x)
+    assert expr.getO() == O(x)
+    assert expr.removeO() == 0
+    assert ((y + O(x**2)) * sin(x)).getO() == O(x**3)
+
+    expr = (x**2 + y + O(x**4)) * (z + x + O(x**3))
+    assert expr.getO() == O(x**3)
+    assert expr.removeO() == (x**2 + y) * (z + x)
+
+    expr = x*y + x**2*z + O(x**3)
+    assert expr.getO() == O(x**3)
+    assert expr.removeO() == x*y + x**2*z
+    assert expr.removeO() + expr.getO() == expr
+
+    assert ((1/x + y) * O(x**2)).getO() == O(x)
+
+
 def test_order_at_infinity():
     assert Order(1 + x, (x, oo)) == Order(x, (x, oo))
     assert Order(3*x, (x, oo)) == Order(x, (x, oo))
